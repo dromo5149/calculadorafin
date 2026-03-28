@@ -416,19 +416,33 @@ body {
     <div class="calc-card" id="msi" style="display:none">
       <div class="card-header">
         <h2>Meses Sin Intereses</h2>
-        <p>El cliente paga el total del equipo dividido en mensualidades fijas sin intereses. Requiere tarjeta de crédito participante.</p>
+        <p>Divide el pago total en mensualidades iguales sin intereses. Dos modalidades disponibles.</p>
       </div>
+
       <div class="input-group"><label>Nombre del equipo o producto</label><input type="text" id="msi_nombre" oninput="calcMSI()" placeholder="Ej: Analizador Hematológico"></div>
-      <div class="input-group"><label>Precio del equipo (SIN IVA)</label><input type="number" id="msi_precio" value="184338" oninput="calcMSI()"></div>
-      <div class="input-group"><label>Instalación + Capacitación (SIN IVA)</label><input type="number" id="msi_instalacion" value="15000" oninput="calcMSI()"></div>
-      <div class="input-group">
-        <label>Plazo MSI</label>
-        <select id="msi_plazo" onchange="calcMSI()">
-          <option value="3">3 meses sin intereses</option>
-          <option value="6" selected>6 meses sin intereses</option>
-          <option value="9">9 meses sin intereses</option>
-          <option value="12">12 meses sin intereses</option>
-        </select>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="input-group"><label>Precio del equipo (SIN IVA)</label><input type="number" id="msi_precio" value="184338" oninput="calcMSI()"></div>
+        <div class="input-group"><label>Instalación + Capacitación (SIN IVA)</label><input type="number" id="msi_instalacion" value="15000" oninput="calcMSI()"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="input-group">
+          <label>Modalidad MSI</label>
+          <select id="msi_modalidad" onchange="calcMSI()">
+            <option value="norlab">NORLAB MSI (directo)</option>
+            <option value="banco">Banco MSI (tarjeta de crédito)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Plazo MSI</label>
+          <select id="msi_plazo" onchange="calcMSI()">
+            <option value="3">3 meses sin intereses</option>
+            <option value="6" selected>6 meses sin intereses</option>
+            <option value="9">9 meses sin intereses</option>
+            <option value="12">12 meses sin intereses</option>
+          </select>
+        </div>
       </div>
 
       <div class="result-box">
@@ -436,7 +450,8 @@ body {
         <div class="result-item"><span>Total a pagar (CON IVA)</span><span class="result-value" id="msi_result_total">$0.00</span></div>
         <div class="result-item"><span>Mensualidad sin intereses</span><span class="result-value" id="msi_result_mensualidad">$0.00</span></div>
         <div class="result-item"><span>Plazo</span><span class="result-value" id="msi_result_plazo">6 meses</span></div>
-        <div class="result-item"><span>Intereses</span><span class="result-value" id="msi_result_intereses">$0.00</span></div>
+        <div class="result-item"><span>Intereses</span><span class="result-value" id="msi_result_intereses" style="color:#16a34a">$0.00</span></div>
+        <div class="result-item" id="msi_modalidad_label"><span>Modalidad</span><span class="result-value" id="msi_result_modalidad">NORLAB MSI</span></div>
       </div>
 
       <div class="breakdown">
@@ -444,10 +459,23 @@ body {
         <table><thead><tr><th>Concepto</th><th>Monto</th></tr></thead><tbody id="msi_breakdown"></tbody></table>
       </div>
 
-      <div class="breakdown" style="margin-top:16px">
-        <h3>Bancos Participantes MSI</h3>
+      <div class="breakdown" style="margin-top:16px" id="msi_norlab_info">
+        <h3>NORLAB MSI — Condiciones</h3>
         <table>
-          <thead><tr><th>Banco</th><th>3 MSI</th><th>6 MSI</th><th>9 MSI</th><th>12 MSI</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Requisito</strong></td><td style="text-align:right">Aprobación crediticia NORLAB</td></tr>
+            <tr><td><strong>Enganche</strong></td><td style="text-align:right">No se requiere</td></tr>
+            <tr><td><strong>Intereses</strong></td><td style="text-align:right;color:#16a34a"><strong>0%</strong></td></tr>
+            <tr><td><strong>Documentación</strong></td><td style="text-align:right">INE + Comprobante domicilio + Estado de cuenta</td></tr>
+            <tr><td><strong>Aplica en</strong></td><td style="text-align:right">Equipos y reactivos > $10,000 MXN</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="breakdown" style="margin-top:16px;display:none" id="msi_banco_info">
+        <h3>Bancos Participantes</h3>
+        <table>
+          <thead><tr><th>Banco</th><th style="text-align:center">3 MSI</th><th style="text-align:center">6 MSI</th><th style="text-align:center">9 MSI</th><th style="text-align:center">12 MSI</th></tr></thead>
           <tbody>
             <tr><td><strong>BBVA</strong></td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td></tr>
             <tr><td><strong>Banamex</strong></td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td></tr>
@@ -457,13 +485,13 @@ body {
             <tr><td><strong>American Express</strong></td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#9ca3af">—</td><td style="text-align:center;color:#16a34a">✓</td></tr>
           </tbody>
         </table>
-        <p style="font-size:0.75rem;color:#9ca3af;margin-top:8px">* Disponibilidad sujeta a promociones vigentes de cada banco. Procesado via Conekta.</p>
+        <p style="font-size:0.75rem;color:#9ca3af;margin-top:8px">* Disponibilidad sujeta a promociones vigentes. Procesado via Conekta.</p>
       </div>
 
       <div class="breakdown" style="margin-top:16px">
-        <h3>Comparativo: MSI vs Financiamiento NORLAB</h3>
+        <h3>Comparativo: MSI vs Financiamiento con Intereses</h3>
         <table>
-          <thead><tr><th>Concepto</th><th>MSI</th><th>Financiamiento</th></tr></thead>
+          <thead><tr><th>Concepto</th><th style="text-align:right">MSI (0%)</th><th style="text-align:right">Financiamiento (2%)</th><th style="text-align:right">Diferencia</th></tr></thead>
           <tbody id="msi_comparativo"></tbody>
         </table>
       </div>
