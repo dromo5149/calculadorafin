@@ -433,7 +433,7 @@ body {
         <div class="form-group">
           <label>Porcentaje de enganche</label>
           <select id="msi_enganche" onchange="calcMSI()">
-            <option value="0">Sin enganche (0%)</option>
+            <option value="0">con enganche (0%)</option>
             <option value="0.10">10%</option>
             <option value="0.20" selected>20%</option>
             <option value="0.25">25%</option>
@@ -624,7 +624,7 @@ function switchTab(tab) {
       doc.text('PRODUCTO: ' + (data.nombre || 'No especificado'), 15, yStart); yStart += 8;
       doc.setFontSize(16); doc.text('MESES SIN INTERESES', 15, yStart);
       doc.setFontSize(10); doc.setFont('helvetica', 'normal');
-      doc.text('Pago dividido en mensualidades iguales sin intereses.', 15, yStart + 7); yStart += 15;
+      doc.text('Pago en mensualidades iguales sin intereses.', 15, yStart + 7); yStart += 15;
       doc.setFillColor(42, 88, 112); doc.roundedRect(15, yStart, pageWidth - 30, 45, 3, 3, 'F');
       doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
       doc.text('RESUMEN PARA EL CLIENTE', 20, yStart + 7);
@@ -633,7 +633,7 @@ function switchTab(tab) {
       doc.setFontSize(11); doc.setTextColor(255, 255, 255);
       doc.text('Mensualidad sin intereses:', 20, yStart + 28);
       doc.setFontSize(18); doc.text(fmt(data.mensualidad), pageWidth - 20, yStart + 28, { align: 'right' });
-      doc.setFontSize(9); doc.text(data.plazo + ' MSI | Enganche: ' + fmt(data.engancheConIVA), 20, yStart + 38);
+      doc.setFontSize(9); doc.text(data.plazo + ' MSI | Enganche: ' + fmt(data.engancheConIVA) + ' | Intereses: $0.00', 20, yStart + 38);
       yStart += 50;
       doc.setTextColor(0, 0, 0); doc.setFontSize(11); doc.setFont('helvetica', 'bold');
       doc.text('Desglose', 15, yStart); yStart += 5;
