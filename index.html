@@ -415,7 +415,7 @@ body {
     <!-- MSI -->
     <div class="calc-card" id="msi" style="display:none">
       <h2 class="calc-title">Meses Sin Intereses</h2>
-      <p class="calc-subtitle">Divide el pago total en mensualidades iguales sin intereses. NORLAB directo o con tarjeta bancaria.</p>
+      <p class="calc-subtitle">Paga el enganche y el resto en mensualidades iguales sin intereses. NORLAB directo o con tarjeta bancaria.</p>
 
       <div class="form-grid">
         <div class="form-group">
@@ -624,7 +624,7 @@ function switchTab(tab) {
       doc.text('PRODUCTO: ' + (data.nombre || 'No especificado'), 15, yStart); yStart += 8;
       doc.setFontSize(16); doc.text('MESES SIN INTERESES', 15, yStart);
       doc.setFontSize(10); doc.setFont('helvetica', 'normal');
-      doc.text('Pago sin intereses, sin enganche.', 15, yStart + 7); yStart += 15;
+      doc.text('Pago dividido en mensualidades iguales sin intereses.', 15, yStart + 7); yStart += 15;
       doc.setFillColor(42, 88, 112); doc.roundedRect(15, yStart, pageWidth - 30, 45, 3, 3, 'F');
       doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
       doc.text('RESUMEN PARA EL CLIENTE', 20, yStart + 7);
