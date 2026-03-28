@@ -789,6 +789,8 @@ function generarPDF() {
           generarPDFRenta(doc, yPos);
         } else if (currentTab === 'comodato') {
           generarPDFComodato(doc, yPos);
+          } else if (currentTab === 'msi') {
+            generarPDFMSI(doc, yPos);
         }
         const modalidad = currentTab.charAt(0).toUpperCase() + currentTab.slice(1);
         doc.save(`NORLAB_Cotizacion_${modalidad}_${Date.now()}.pdf`);
