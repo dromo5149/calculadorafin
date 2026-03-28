@@ -431,6 +431,18 @@ body {
           <input type="number" id="msi_instalacion" value="15000" oninput="calcMSI()">
         </div>
         <div class="form-group">
+          <label>Porcentaje de enganche</label>
+          <select id="msi_enganche" onchange="calcMSI()">
+            <option value="0">Sin enganche (0%)</option>
+            <option value="0.10">10%</option>
+            <option value="0.20" selected>20%</option>
+            <option value="0.25">25%</option>
+            <option value="0.30">30%</option>
+            <option value="0.40">40%</option>
+            <option value="0.50">50%</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label>Modalidad MSI</label>
           <select id="msi_modalidad" onchange="calcMSI()">
             <option value="norlab">NORLAB MSI (directo)</option>
@@ -451,8 +463,12 @@ body {
       <div class="results">
         <div class="results-title">Resumen para el Cliente</div>
         <div class="result-row">
+          <span class="result-label">Enganche a pagar (CON IVA)</span>
+          <span class="result-value highlight" id="msi_result_enganche">$0.00</span>
+        </div>
+        <div class="result-row">
           <span class="result-label">Total a pagar (CON IVA)</span>
-          <span class="result-value highlight" id="msi_result_total">$0.00</span>
+          <span class="result-value" id="msi_result_total">$0.00</span>
         </div>
         <div class="result-row">
           <span class="result-label">Mensualidad sin intereses</span>
@@ -541,40 +557,47 @@ function switchTab(tab) {
       const precio = parseFloat(document.getElementById('msi_precio').value) || 0;
       const instalacion = parseFloat(document.getElementById('msi_instalacion').value) || 0;
       const plazo = parseInt(document.getElementById('msi_plazo').value);
+      const engPct = parseFloat(document.getElementById('msi_enganche').value);
 
       const totalSinIVA = precio + instalacion;
-      const iva = totalSinIVA * 0.16;
-      const totalConIVA = totalSinIVA + iva;
-      const mensualidad = totalConIVA / plazo;
-
-      // Comparativo con financiamiento (mismo plazo, 30% enganche, 2% tasa)
-      const engPct = 0.30;
-      const tasa = 0.02;
       const engancheSinIVA = totalSinIVA * engPct;
-      const montoFin = totalSinIVA - engancheSinIVA;
-      const factor = Math.pow(1 + tasa, plazo);
-      const mensFin = plazo > 0 ? montoFin * (tasa * factor) / (factor - 1) : 0;
-      const mensFinConIVA = mensFin * 1.16;
+      const montoMSI = totalSinIVA - engancheSinIVA;
       const engancheConIVA = engancheSinIVA * 1.16;
+      const montoMSIConIVA = montoMSI * 1.16;
+      const mensualidad = montoMSIConIVA / plazo;
+      const totalConIVA = totalSinIVA * 1.16;
+      const totalAPagar = engancheConIVA + montoMSIConIVA;
+
+      // Comparativo con financiamiento (mismo enganche, 2% tasa)
+      const tasa = 0.02;
+      const factor = Math.pow(1 + tasa, plazo);
+      const mensFin = plazo > 0 ? montoMSI * (tasa * factor) / (factor - 1) : 0;
+      const mensFinConIVA = mensFin * 1.16;
       const totalFin = engancheConIVA + (mensFinConIVA * plazo);
+      var ahorro = totalFin - totalAPagar;
 
       calculationData.msi = {
         nombre: document.getElementById('msi_nombre').value,
-        precio, instalacion, plazo, totalSinIVA, iva, totalConIVA, mensualidad,
-        engancheConIVA, mensFinConIVA, totalFin
+        precio, instalacion, plazo, engPct, totalSinIVA, engancheSinIVA, engancheConIVA,
+        montoMSI, montoMSIConIVA, mensualidad, totalConIVA, totalAPagar,
+        mensFinConIVA, totalFin, ahorro
       };
 
-      document.getElementById('msi_result_total').textContent = fmt(totalConIVA);
+      document.getElementById('msi_result_enganche').textContent = fmt(engancheConIVA);
+      document.getElementById('msi_result_total').textContent = fmt(totalAPagar);
       document.getElementById('msi_result_mensualidad').textContent = fmt(mensualidad);
       document.getElementById('msi_result_plazo').textContent = plazo + ' meses';
 
-      const breakdown = [
+      var breakdown = [
         ['Precio del equipo (SIN IVA)', fmt(precio)],
         ['Instalacion (SIN IVA)', fmt(instalacion)],
-        ['Subtotal SIN IVA', fmt(totalSinIVA)],
-        ['IVA (16%)', fmt(iva)],
-        ['<strong>Total CON IVA</strong>', '<strong>' + fmt(totalConIVA) + '</strong>'],
-        ['Plazo MSI', plazo + ' meses'],
+        ['Total SIN IVA', fmt(totalSinIVA)],
+        ['Enganche SIN IVA (' + (engPct*100) + '%)', fmt(engancheSinIVA)],
+        ['IVA sobre enganche', fmt(engancheSinIVA * 0.16)],
+        ['<strong>Enganche CON IVA</strong>', '<strong>' + fmt(engancheConIVA) + '</strong>'],
+        ['Monto a diferir SIN IVA', fmt(montoMSI)],
+        ['IVA sobre monto diferido', fmt(montoMSI * 0.16)],
+        ['<strong>Monto a diferir CON IVA</strong>', '<strong>' + fmt(montoMSIConIVA) + '</strong>'],
         ['<strong>Mensualidad SIN intereses</strong>', '<strong>' + fmt(mensualidad) + '</strong>'],
         ['Intereses cobrados', '<strong style="color:#16a34a">$0.00</strong>'],
       ];
@@ -582,12 +605,11 @@ function switchTab(tab) {
         return '<tr><td>' + r[0] + '</td><td style="text-align:right">' + r[1] + '</td></tr>';
       }).join('');
 
-      var ahorro = totalFin - totalConIVA;
-      const comparativo = [
-        ['Enganche', '<strong style="color:#16a34a">$0.00</strong>', fmt(engancheConIVA), fmt(engancheConIVA)],
+      var comparativo = [
+        ['Enganche', fmt(engancheConIVA), fmt(engancheConIVA), '-'],
         ['Mensualidad', fmt(mensualidad), fmt(mensFinConIVA), fmt(mensFinConIVA - mensualidad)],
-        ['Total a pagar', fmt(totalConIVA), fmt(totalFin), '<strong style="color:#16a34a">' + fmt(ahorro) + '</strong>'],
-        ['Intereses', '<strong style="color:#16a34a">$0.00</strong>', fmt(totalFin - totalConIVA), fmt(totalFin - totalConIVA)],
+        ['Total a pagar', fmt(totalAPagar), fmt(totalFin), '<strong style="color:#16a34a">' + fmt(ahorro) + '</strong>'],
+        ['Intereses', '<strong style="color:#16a34a">$0.00</strong>', fmt(totalFin - totalAPagar), fmt(totalFin - totalAPagar)],
       ];
       document.getElementById('msi_comparativo').innerHTML = comparativo.map(function(r) {
         return '<tr><td>' + r[0] + '</td><td style="text-align:right">' + r[1] + '</td><td style="text-align:right">' + r[2] + '</td><td style="text-align:right">' + r[3] + '</td></tr>';
@@ -611,15 +633,16 @@ function switchTab(tab) {
       doc.setFontSize(11); doc.setTextColor(255, 255, 255);
       doc.text('Mensualidad sin intereses:', 20, yStart + 28);
       doc.setFontSize(18); doc.text(fmt(data.mensualidad), pageWidth - 20, yStart + 28, { align: 'right' });
-      doc.setFontSize(9); doc.text(data.plazo + ' meses | Intereses: $0.00 | Sin enganche', 20, yStart + 38);
+      doc.setFontSize(9); doc.text(data.plazo + ' MSI | Enganche: ' + fmt(data.engancheConIVA), 20, yStart + 38);
       yStart += 50;
       doc.setTextColor(0, 0, 0); doc.setFontSize(11); doc.setFont('helvetica', 'bold');
       doc.text('Desglose', 15, yStart); yStart += 5;
       var bd = [
         ['Precio equipo SIN IVA', '$' + fmtNum(data.precio)],
         ['Instalacion SIN IVA', '$' + fmtNum(data.instalacion)],
-        ['IVA (16%)', '$' + fmtNum(data.iva)],
-        ['TOTAL CON IVA', '$' + fmtNum(data.totalConIVA)],
+        ['Enganche CON IVA (' + (data.engPct*100) + '%)', '$' + fmtNum(data.engancheConIVA)],
+        ['Monto a diferir CON IVA', '$' + fmtNum(data.montoMSIConIVA)],
+        
         ['Mensualidad (' + data.plazo + ' MSI)', '$' + fmtNum(data.mensualidad)],
         ['Intereses', '$0.00'],
       ];
