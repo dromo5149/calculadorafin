@@ -223,6 +223,7 @@ body {
     <button class="tab active" onclick="switchTab('financiamiento')">Financiamiento</button>
     <button class="tab" onclick="switchTab('renta')">Renta</button>
     <button class="tab" onclick="switchTab('comodato')">Comodato</button>
+        <button class="tab" onclick="switchTab('msi')">MSI</button>
   </div>
   <div id="financiamiento" class="calc-card">
     <h2 class="calc-title">Financiamiento</h2>
@@ -410,6 +411,64 @@ body {
     </div>
   </div>
 </div>
+
+    <!-- MSI -->
+    <div class="calc-card" id="msi" style="display:none">
+      <div class="card-header">
+        <h2>Meses Sin Intereses</h2>
+        <p>El cliente paga el total del equipo dividido en mensualidades fijas sin intereses. Requiere tarjeta de crédito participante.</p>
+      </div>
+      <div class="input-group"><label>Nombre del equipo o producto</label><input type="text" id="msi_nombre" oninput="calcMSI()" placeholder="Ej: Analizador Hematológico"></div>
+      <div class="input-group"><label>Precio del equipo (SIN IVA)</label><input type="number" id="msi_precio" value="184338" oninput="calcMSI()"></div>
+      <div class="input-group"><label>Instalación + Capacitación (SIN IVA)</label><input type="number" id="msi_instalacion" value="15000" oninput="calcMSI()"></div>
+      <div class="input-group">
+        <label>Plazo MSI</label>
+        <select id="msi_plazo" onchange="calcMSI()">
+          <option value="3">3 meses sin intereses</option>
+          <option value="6" selected>6 meses sin intereses</option>
+          <option value="9">9 meses sin intereses</option>
+          <option value="12">12 meses sin intereses</option>
+        </select>
+      </div>
+
+      <div class="result-box">
+        <h3>Resumen para el Cliente</h3>
+        <div class="result-item"><span>Total a pagar (CON IVA)</span><span class="result-value" id="msi_result_total">$0.00</span></div>
+        <div class="result-item"><span>Mensualidad sin intereses</span><span class="result-value" id="msi_result_mensualidad">$0.00</span></div>
+        <div class="result-item"><span>Plazo</span><span class="result-value" id="msi_result_plazo">6 meses</span></div>
+        <div class="result-item"><span>Intereses</span><span class="result-value" id="msi_result_intereses">$0.00</span></div>
+      </div>
+
+      <div class="breakdown">
+        <h3>Desglose del Cálculo</h3>
+        <table><thead><tr><th>Concepto</th><th>Monto</th></tr></thead><tbody id="msi_breakdown"></tbody></table>
+      </div>
+
+      <div class="breakdown" style="margin-top:16px">
+        <h3>Bancos Participantes MSI</h3>
+        <table>
+          <thead><tr><th>Banco</th><th>3 MSI</th><th>6 MSI</th><th>9 MSI</th><th>12 MSI</th></tr></thead>
+          <tbody>
+            <tr><td><strong>BBVA</strong></td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td></tr>
+            <tr><td><strong>Banamex</strong></td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td></tr>
+            <tr><td><strong>Santander</strong></td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#9ca3af">—</td><td style="text-align:center;color:#16a34a">✓</td></tr>
+            <tr><td><strong>HSBC</strong></td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#9ca3af">—</td></tr>
+            <tr><td><strong>Banorte</strong></td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td></tr>
+            <tr><td><strong>American Express</strong></td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#16a34a">✓</td><td style="text-align:center;color:#9ca3af">—</td><td style="text-align:center;color:#16a34a">✓</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:0.75rem;color:#9ca3af;margin-top:8px">* Disponibilidad sujeta a promociones vigentes de cada banco. Procesado via Conekta.</p>
+      </div>
+
+      <div class="breakdown" style="margin-top:16px">
+        <h3>Comparativo: MSI vs Financiamiento NORLAB</h3>
+        <table>
+          <thead><tr><th>Concepto</th><th>MSI</th><th>Financiamiento</th></tr></thead>
+          <tbody id="msi_comparativo"></tbody>
+        </table>
+      </div>
+    </div>
+
 <script>
 window.addEventListener('load', () => {
   if (typeof window.jspdf === 'undefined') {
@@ -807,6 +866,7 @@ function generarPDFComodato(doc, yStart) {
 calcFinanciamiento();
 calcRenta();
 calcComodato();
+    calcMSI();
 </script>
 </body>
 </html>
